@@ -1,7 +1,7 @@
 'use client'
 
 import { useEffect, useState } from 'react'
-import { apiClient, type HealthStatus as HealthStatusType } from '@/lib/api'
+import { apiClient, type HealthStatus as HealthStatusType } from '@/lib/api';
 
 export function HealthStatus() {
   const [health, setHealth] = useState<HealthStatusType | null>(null)
