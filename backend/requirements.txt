@@ -1,0 +1,14 @@
+fastapi==0.109.0
+uvicorn==0.27.0
+langgraph==0.0.28
+langchain==0.1.10
+langchain-openai==0.0.8
+pydantic==2.5.3
+python-dotenv==1.0.0
+httpx==0.25.2
+psycopg2-binary==2.9.9
+sqlalchemy==2.0.23
+pgvector==0.2.4
+opentelemetry-api==1.21.0
+opentelemetry-sdk==1.21.0
+avwx-engine>=1.8.0

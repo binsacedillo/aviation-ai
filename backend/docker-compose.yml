@@ -1,0 +1,59 @@
+version: '3.8'
+
+services:
+  # Backend API
+  backend:
+    build:
+      context: .
+      dockerfile: Dockerfile.backend
+    ports:
+      - "8000:8000"
+    environment:
+      - LOG_LEVEL=info
+      - ENVIRONMENT=development
+      - PYTHONUNBUFFERED=1
+    volumes:
+      - ./src:/app/src
+      - ./logs:/app/logs
+    command: >
+      python -m uvicorn src.api.main:app
+      --host 0.0.0.0 --port 8000 --reload
+    networks:
+      - flight-copilot
+
+  # Frontend
+  frontend:
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile
+    ports:
+      - "3000:3000"
+    environment:
+      - NEXT_PUBLIC_API_URL=http://localhost:8000
+    depends_on:
+      - backend
+    networks:
+      - flight-copilot
+    command: npm run dev
+
+  # Optional: PostgreSQL Database
+  # Uncomment if using database
+  # database:
+  #   image: postgres:15-alpine
+  #   environment:
+  #     POSTGRES_DB: flight_copilot
+  #     POSTGRES_USER: postgres
+  #     POSTGRES_PASSWORD: secure_password
+  #   ports:
+  #     - "5432:5432"
+  #   volumes:
+  #     - postgres_data:/var/lib/postgresql/data
+  #   networks:
+  #     - flight-copilot
+
+networks:
+  flight-copilot:
+    driver: bridge
+
+# volumes:
+#   postgres_data:
