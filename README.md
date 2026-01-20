@@ -114,32 +114,33 @@ Visit **http://localhost:3000** and test queries:
 
 ## 🔑 Environment Variables
 
-### Backend (.env)
+### Backend Setup
 
-```env
-# LLM Configuration
-OLLAMA_ENABLED=true
-OLLAMA_MODEL=llama3.2
-OLLAMA_BASE_URL=http://localhost:11434
-
-# Aviation Data
-AVWX_API_KEY=your_avwx_api_key_here
-
-# API Configuration
-API_HOST=0.0.0.0
-API_PORT=8000
-LOG_LEVEL=INFO
-
-# Agent Configuration
-MAX_AGENT_LOOPS=5
-AGENT_TIMEOUT_SECONDS=30
+1. Copy the example file:
+```bash
+cp backend/.env.example backend/.env
 ```
 
-### Frontend (.env.local)
+2. Edit `backend/.env` and add your actual keys:
+```env
+AVWX_API_KEY=your_actual_api_key_here
+OLLAMA_ENABLED=true
+# ... other settings
+```
 
+### Frontend Setup
+
+1. Copy the example file:
+```bash
+cp frontend/.env.example frontend/.env.local
+```
+
+2. Edit `frontend/.env.local`:
 ```env
 NEXT_PUBLIC_API_URL=http://localhost:8000
 ```
+
+**⚠️ Important:** Never commit `.env` files! They're in `.gitignore` for security.
 
 ---
 
