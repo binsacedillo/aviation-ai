@@ -1,7 +1,7 @@
 'use client'
 
 import { useState } from 'react'
-import { apiClient, QueryResponse } from '@/lib/api'
+import { apiClient, QueryResponse } from '../lib/api'
 import MetarDisplay from './MetarDisplay'
 
 export function QueryInterface() {
