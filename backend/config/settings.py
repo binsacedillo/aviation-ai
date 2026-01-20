@@ -21,6 +21,10 @@ class Settings:
     # Anthropic (Claude)
     ANTHROPIC_API_KEY: str = os.getenv("ANTHROPIC_API_KEY", "")
     
+    # Groq (fast, free API)
+    GROQ_API_KEY: str = os.getenv("GROQ_API_KEY", "")
+    GROQ_MODEL: str = os.getenv("GROQ_MODEL", "llama-3.1-70b-versatile")
+    
     # Ollama (local, free LLM)
     OLLAMA_ENABLED: bool = os.getenv("OLLAMA_ENABLED", "false").lower() == "true"
     OLLAMA_MODEL: str = os.getenv("OLLAMA_MODEL", "llama3.2")
@@ -51,6 +55,11 @@ class Settings:
     def has_anthropic_key(self) -> bool:
         """Check if Anthropic API key is configured."""
         return bool(self.ANTHROPIC_API_KEY and self.ANTHROPIC_API_KEY != "")
+    
+    @property
+    def has_groq_key(self) -> bool:
+        """Check if Groq API key is configured."""
+        return bool(self.GROQ_API_KEY and self.GROQ_API_KEY != "")
     
     @property
     def has_ollama(self) -> bool:

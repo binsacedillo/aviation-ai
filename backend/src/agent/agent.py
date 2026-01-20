@@ -88,7 +88,7 @@ class FlightAssistantAgent:
     def __init__(self):
         self.loop_count = 0
         self.max_loops = settings.MAX_AGENT_LOOPS  # Prevent infinite loops
-        self.use_real_llm = settings.has_openai_key or settings.has_anthropic_key or settings.has_ollama
+        self.use_real_llm = settings.has_openai_key or settings.has_anthropic_key or settings.has_groq_key or settings.has_ollama
         self.guardrail = CrosswindGuardrail(threshold_kt=3.0)
         self.metar_data = None  # Store METAR from last fetch
         self.runway_heading = None  # Store runway heading from last selection
@@ -628,10 +628,37 @@ Your recalculated response:
                 yield {"type": "tool_result", "tool": tool_name, "result": result}
 
     def _llm_response(self, user_query: str) -> str:
-        """Generate a response using an available LLM (Ollama preferred)."""
+        """Generate a response using an available LLM (Groq → Ollama → fallback)."""
         prompt = self._create_llm_direct_prompt(user_query)
 
-        # Prefer Ollama when enabled (use direct HTTP API to avoid streaming hangs)
+        # Try Groq first (fast, free, cloud-based)
+        if settings.has_groq_key:
+            try:
+                import httpx
+                resp = httpx.post(
+                    "https://api.groq.com/openai/v1/chat/completions",
+                    headers={
+                        "Authorization": f"Bearer {settings.GROQ_API_KEY}",
+                        "Content-Type": "application/json",
+                    },
+                    json={
+                        "model": settings.GROQ_MODEL,
+                        "messages": [{"role": "user", "content": prompt}],
+                        "temperature": 0.2,
+                    },
+                    timeout=httpx.Timeout(10.0, connect=5.0),
+                )
+                if resp.status_code == 200:
+                    data = resp.json()
+                    return data["choices"][0]["message"]["content"]
+                return f"Groq API returned status {resp.status_code}: {resp.text}"
+            except httpx.TimeoutException:
+                return "Groq API request timed out. Falling back to pattern matching."
+            except Exception as exc:  # noqa: BLE001
+                print(f"⚠️ Groq API error: {exc}. Falling back...")
+                # Continue to Ollama fallback
+
+        # Try Ollama when enabled (use direct HTTP API to avoid streaming hangs)
         if settings.has_ollama:
             try:
                 import httpx
@@ -660,7 +687,7 @@ Your recalculated response:
         # Fallback if other LLM keys exist but not implemented
         return (
             "LLM integration is enabled but no provider is configured. "
-            "Add OPENAI_API_KEY or enable Ollama to use real LLM responses."
+            "Add GROQ_API_KEY or enable Ollama to use real LLM responses."
         )
 
     def _create_llm_direct_prompt(self, user_query: str) -> str:
