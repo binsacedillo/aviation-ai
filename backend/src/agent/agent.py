@@ -652,8 +652,8 @@ Your recalculated response:
         # Try Ollama when enabled (use direct HTTP API to avoid streaming hangs)
         if settings.has_ollama:
             try:
-                import httpx
-                resp = httpx.post(
+                import requests
+                resp = requests.post(
                     f"{settings.OLLAMA_BASE_URL}/api/generate",
                     json={
                         "model": settings.OLLAMA_MODEL,
@@ -661,13 +661,13 @@ Your recalculated response:
                         "stream": False,
                         "options": {"temperature": 0.2},
                     },
-                    timeout=httpx.Timeout(10.0, connect=5.0),  # 10 sec timeout
+                    timeout=10.0,
                 )
                 if resp.status_code == 200:
                     data = resp.json()
                     return data.get("response", "")
                 return f"Ollama returned status {resp.status_code}: {resp.text}"
-            except httpx.TimeoutException:
+            except requests.exceptions.Timeout:
                 return "Ollama request timed out. Please ensure Ollama service is running."
             except Exception as exc:  # noqa: BLE001
                 return (
