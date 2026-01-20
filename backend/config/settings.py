@@ -23,7 +23,7 @@ class Settings:
     
     # Groq (fast, free API)
     GROQ_API_KEY: str = os.getenv("GROQ_API_KEY", "")
-    GROQ_MODEL: str = os.getenv("GROQ_MODEL", "llama-3.1-70b-versatile")
+    GROQ_MODEL: str = os.getenv("GROQ_MODEL", "llama3-8b-8192")
     
     # Ollama (local, free LLM)
     OLLAMA_ENABLED: bool = os.getenv("OLLAMA_ENABLED", "false").lower() == "true"
