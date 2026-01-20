@@ -634,28 +634,19 @@ Your recalculated response:
         # Try Groq first (fast, free, cloud-based)
         if settings.has_groq_key:
             try:
-                import httpx
-                resp = httpx.post(
-                    "https://api.groq.com/openai/v1/chat/completions",
-                    headers={
-                        "Authorization": f"Bearer {settings.GROQ_API_KEY}",
-                        "Content-Type": "application/json",
-                    },
-                    json={
-                        "model": settings.GROQ_MODEL,
-                        "messages": [{"role": "user", "content": prompt}],
-                        "temperature": 0.2,
-                    },
-                    timeout=httpx.Timeout(10.0, connect=5.0),
+                from groq import Groq
+                client = Groq(api_key=settings.GROQ_API_KEY)
+                completion = client.chat.completions.create(
+                    model=settings.GROQ_MODEL,
+                    messages=[{"role": "user", "content": prompt}],
+                    temperature=0.2,
+                    max_tokens=500,
                 )
-                if resp.status_code == 200:
-                    data = resp.json()
-                    return data["choices"][0]["message"]["content"]
-                return f"Groq API returned status {resp.status_code}: {resp.text}"
-            except httpx.TimeoutException:
-                return "Groq API request timed out. Falling back to pattern matching."
+                return completion.choices[0].message.content
+            except ImportError:
+                print("⚠️ Groq SDK not installed. Run: pip install groq", flush=True)
             except Exception as exc:  # noqa: BLE001
-                print(f"⚠️ Groq API error: {exc}. Falling back...")
+                print(f"⚠️ Groq API exception: {exc}. Falling back...", flush=True)
                 # Continue to Ollama fallback
 
         # Try Ollama when enabled (use direct HTTP API to avoid streaming hangs)
