@@ -56,7 +56,7 @@ def fetch_metar_real(icao_code: str) -> Dict[str, Any]:
                 "visibility_sm": data.get("visibility", {}).get("repr", "10 SM"),
                 "altimeter": data.get("altimeter", {}).get("repr", "30.00 inHg"),
                 "flight_category": data.get("flight_rules", "VFR"),
-                "source": "AVWX Live",
+                "source": "live",
             }
         else:
             print(f"⚠️ AVWX API returned {response.status_code} for {icao_code}. Using fallback data.")
